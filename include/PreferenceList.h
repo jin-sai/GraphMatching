@@ -47,6 +47,9 @@ public:
     /// insert element at end
     void emplace_back(VertexPtr v);
 
+    /// insert element at end with tie
+    void emplace_back_with_tie(VertexPtr v);
+
     /// find the vertex in the container
     SizeType find(VertexPtr v);
 

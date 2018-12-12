@@ -168,10 +168,40 @@ void GraphReader::read_preference_list(BipartiteGraph::ContainerType& A,
     // read and store the preference list
     PreferenceList& pref_list = v->get_preference_list();
     while (curtok_ != TOK_SEMICOLON) {
-        std::string b = lexer_->get_lexeme();
-        match(TOK_STRING);
-        pref_list.emplace_back(partners[b]);
+    	// check if there is a tie in the preference list
+        if (curtok_ == TOK_LEFT_BRACE) {
+            // eat '('
+            match(TOK_LEFT_BRACE);
+            
+            // read and store the first tied vertex
+            // from the preference list
+            std::string b = lexer_->get_lexeme();
+            match(TOK_STRING);
+            pref_list.emplace_back(partners[b]);
+            
+            // if there are more vertices, they must
+            // be delimited using commas
+            while (curtok_ == TOK_COMMA) {
+                // eat ','
+                match(TOK_COMMA);
 
+                // read and store the next vertex from
+                // the preference list
+                b = lexer_->get_lexeme();
+                match(TOK_STRING);
+                pref_list.emplace_back_with_tie(partners[b]);
+            }
+
+            // eat ')'
+            match(TOK_RIGHT_BRACE);
+        } else {
+        	// read and store the vertex from
+            // the preference list
+            std::string b = lexer_->get_lexeme();
+            match(TOK_STRING);
+            pref_list.emplace_back(partners[b]);
+        }
+        
         // if there are more vertices, they must
         // be delimited using commas
         if (curtok_ != TOK_SEMICOLON) {

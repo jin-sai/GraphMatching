@@ -59,6 +59,14 @@ void PreferenceList::emplace_back(VertexPtr v) {
     end_iter_ = pref_list_.size();
 }
 
+/// insert element at end with tie
+void PreferenceList::emplace_back_with_tie(VertexPtr v) {
+    pref_list_.emplace_back(cur_rank_, v);
+
+    // end_iter_ always points one past the end of preference list
+    end_iter_ = pref_list_.size();
+}
+
 /// find the vertex in the container
 PreferenceList::SizeType PreferenceList::find(VertexPtr v) {
     for (SizeType i = begin(), e = end(); i != e; ++i) {
