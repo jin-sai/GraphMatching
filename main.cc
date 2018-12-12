@@ -8,6 +8,7 @@
 #include "HHeuristicHRLQ.h"
 #include "YokoiEnvyfreeHRLQ.h"
 #include "MaximalEnvyfreeHRLQ.h"
+#include "ClassifiedPopular.h"
 #include "Utils.h"
 #include <stdexcept>
 #include <iostream>
@@ -24,7 +25,7 @@ void compute_matching(bool A_proposing, const char* input_file, const char* outp
         std::ofstream out(output_file);
         print_matching(G, M, out);
     } else {
-        throw std::runtime_error("unable to compute matching.");
+        std::cout << "No popular matching\n";
     }
 }
 
@@ -37,6 +38,7 @@ int main(int argc, char* argv[]) {
     bool compute_hhrlq = false;
     bool compute_yhrlq = false;
     bool compute_ehrlq = false;
+    bool compute_cpm = false;
     bool A_proposing = true;
     const char* input_file = nullptr;
     const char* output_file = nullptr;
@@ -46,9 +48,10 @@ int main(int argc, char* argv[]) {
     // -s, -p, and -m flags compute the stable, max-card popular and pop among
     // max-card matchings respectively
     // -r and -h compute the resident and hopsital heuristic for an HRLQ instance
+    // -c computes the many-to-one popular matching
     // -i is the path to the input graph, -o is the path where the matching
     // computed should be stored
-    while ((c = getopt(argc, argv, "ABspmrhyei:o:")) != -1) {
+    while ((c = getopt(argc, argv, "ABspmrhyeci:o:")) != -1) {
         switch (c) {
             case 'A': A_proposing = true; break;
             case 'B': A_proposing = false; break;
@@ -59,6 +62,7 @@ int main(int argc, char* argv[]) {
             case 'h': compute_hhrlq = true; break;
             case 'y': compute_yhrlq = true; break;
             case 'e': compute_ehrlq = true; break;
+            case 'c': compute_cpm = true; break;
             case 'i': input_file = optarg; break;
             case 'o': output_file = optarg; break;
             case '?':
@@ -90,6 +94,8 @@ int main(int argc, char* argv[]) {
         compute_matching<YokoiEnvyfreeHRLQ>(A_proposing, input_file, output_file);
     } else if (compute_ehrlq) {
         compute_matching<MaximalEnvyfreeHRLQ>(A_proposing, input_file, output_file);
+    } else if (compute_cpm) {
+        compute_matching<ClassifiedPopular>(A_proposing, input_file, output_file);
     }
 
     return 0;
