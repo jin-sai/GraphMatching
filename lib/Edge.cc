@@ -3,8 +3,8 @@
 Edge::Edge()
 {}
 
-Edge::Edge(NodePtr U, NodePtr V, FlowType Capacity, RankType Rank /* = 0 */)
-	: U_(U), V_(V), Rank_(Rank), Capacity_(Capacity), Flow_(0)
+Edge::Edge(NodePtr U, NodePtr V, FlowType capacity, RankType rank /* = 0 */)
+	: U_(U), V_(V), rank_(rank), capacity_(capacity), flow_(0)
 {}
 
 Edge::~Edge()
@@ -19,21 +19,21 @@ const NodePtr& Edge::get_V() const {
 }
 
 const FlowType& Edge::get_flow() const {
-	return Flow_;
+	return flow_;
 }
 
 const FlowType& Edge::get_capacity() const {
-	return Capacity_;
+	return capacity_;
 }
 
 const RankType& Edge::get_rank() const {
-	return Rank_;
+	return rank_;
 }
 
-void Edge::set_flow(FlowType Flow) {
-	Flow_ = Flow;
+void Edge::set_flow(FlowType flow) {
+	flow_ = flow;
 }
 
-void Edge::set_capacity(FlowType Capacity) {
-	Capacity_ = Capacity;
+void Edge::set_capacity(FlowType capacity) {
+	capacity_ = capacity;
 }

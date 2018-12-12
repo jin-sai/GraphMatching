@@ -8,20 +8,20 @@
 class Edge{
 private:
 	NodePtr U_, V_;      // nodes which contain the edge (U_->V_)
-	RankType Rank_;      // rank (if any) of the edge in the original graph
-	FlowType Capacity_;  // capacity of the edge
-	FlowType Flow_;      // flow through the edge
+	RankType rank_;      // rank (if any) of the edge in the original graph
+	FlowType capacity_;  // capacity of the edge
+	FlowType flow_;      // flow through the edge
 public:
 	Edge();
-	Edge(NodePtr U, NodePtr V, FlowType Capacity, RankType Rank = 0);
+	Edge(NodePtr U, NodePtr V, FlowType capacity, RankType rank = 0);
 	~Edge();
 	const NodePtr& get_U() const;
 	const NodePtr& get_V() const;
 	const FlowType& get_flow() const;
 	const FlowType& get_capacity() const;
 	const RankType& get_rank() const;
-	void set_flow(FlowType Flow);
-	void set_capacity(FlowType Capacity);
+	void set_flow(FlowType flow);
+	void set_capacity(FlowType capacity);
 };
 
 #endif

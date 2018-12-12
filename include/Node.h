@@ -6,18 +6,18 @@
 // Node in a flow network.
 class Node {
 private:
-	IdType NodeName_;       // name of the node (for instance, C_a_b)
-	NodeType Id_;           // id of this node
-	IdType Decomposition_;  // decomposition label for the node (S or T or U)
+	IdType node_name_;            // name of the node (for instance, C_a_b)
+	NodeType node_id_;            // id of this node
+	IdType decomposition_label_;  // decomposition label for the node (S or T or U)
 
 public:
 	Node();
-	Node(IdType NodeName, NodeType Id);
+	Node(IdType node_name, NodeType node_id);
 	~Node();
 	const IdType& get_name() const;
 	const NodeType& get_id() const;
 	const IdType& get_decomposition_label() const;
-	void set_decomposition_label(IdType Decomposition);
+	void set_decomposition_label(IdType decomposition_label);
 };
 
 #endif
