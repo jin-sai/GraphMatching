@@ -25,7 +25,7 @@ The executable takes a set of parameters to compute the desired matching:
 	-m -- compute a maximum cardinality matching
 	-h -- compute a matching in a given HRLQ instance
 	-c -- compute a many-to-one popular matching using CPM algorithm
-	-l -- compute a many-to-one popular matching using CRMM algorithm
+	-l -- compute a many-to-many rank maximal matching using CRMM algorithm
 
 To provide an input graph, and the output matching filename:
 
