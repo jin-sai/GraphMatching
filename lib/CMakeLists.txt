@@ -6,4 +6,4 @@ add_library(graph
                 YokoiEnvyfreeHRLQ.cc MaximalEnvyfreeHRLQ.cc
                 BipartiteGraph.cc PartnerList.cc PreferenceList.cc Vertex.cc
                 GraphReader.cc Utils.cc Node.cc Edge.cc
-                FlowNetwork.cc ClassifiedPopular.cc ClassifiedRankMaximal.cc)
+                FlowNetwork.cc ClassifiedPopular.cc ClassifiedRankMaximal.cc RelaxedStable.cc)

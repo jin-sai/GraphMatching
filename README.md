@@ -21,6 +21,7 @@ This should build an executable named graphmatching inside the build directory.
 The executable takes a set of parameters to compute the desired matching:
 
 	-s -- compute a stable matching
+	-k -- compute a Relaxed stable matching
 	-p -- compute a maximum cardinality popular matching
 	-m -- compute a maximum cardinality matching
 	-h -- compute a matching in a given HRLQ instance
