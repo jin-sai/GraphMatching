@@ -13,6 +13,6 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 add_subdirectory(lib)
 
 # build and install
-add_executable(graphmatching main.cc "include/RelaxedStable.h")
+add_executable(graphmatching main.cc "include/RelaxedStable.h" "include/Statistics.h")
 target_link_libraries(graphmatching graph)
 install(TARGETS graphmatching RUNTIME DESTINATION bin)

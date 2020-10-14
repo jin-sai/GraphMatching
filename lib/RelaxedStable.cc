@@ -1,5 +1,6 @@
 #include "RelaxedStable.h"
 #include "ClassifiedPopular.h"
+#include "Statistics.h"
 #include "Vertex.h"
 #include "PartnerList.h"
 #include "Utils.h"
@@ -17,8 +18,6 @@ RelaxedStable::~RelaxedStable()
 
 //check if output matching is relaxed stable
 bool RelaxedStable::is_relaxed_stable(const std::unique_ptr<BipartiteGraph>& G, MatchedPairListType& M) {
-    /////////////////////////////////
-    //print_matching(G, M, std::cout);
     //map to maintain residents which are in blocking pair
     std::map<VertexPtr, bool> in_blocking_pair;
     //for each resident
@@ -42,40 +41,20 @@ bool RelaxedStable::is_relaxed_stable(const std::unique_ptr<BipartiteGraph>& G, 
                 break;
             }
 
-            ///////////////////////redundant
-            //if resident is matched
-            //if (u_partnerlist.size() > 0) {
-                //the hospital to which u is matched
-              //  auto v_alloted = u_partnerlist.get_vertex(u_partnerlist.begin());
-                //if (u_pref_list.is_ranked_better(v_alloted, v)) {
-                  //  continue;
-                //}
-            //}
-            //////////////////////////////
-
-
             PreferenceList& v_pref_list = v->get_preference_list();
-            auto v_partnerlist = M_[v];
+            auto v_partnerlist = M[v];
             //if v is fully subscribed
             if (v_partnerlist.size() >= v->get_upper_quota()) {
                 auto u_least_preferred = v_partnerlist.get_vertex(v_partnerlist.get_least_preferred());
                 if (v_pref_list.is_ranked_better(u_least_preferred, u)) {
-                    ////////////////////////////////////////////////////////////////
-                    //std::cout << v->get_id() << " doesnot prefers " << u_least_preferred->get_id() << " over " << u->get_id() << "\n";
                     continue;
                 }
-                ////////////////////////////////////////////////////////////////
-                //std::cout << v->get_id() << " prefers " << u_least_preferred->get_id() << " over "<<u->get_id()<<"\n";
             }
             in_blocking_pair[u] = true;
             in_blocking_pair[v] = true;
-            ////////////////////////////////////////////////////////////////
-            //std::cout << u->get_id() << " , " << v->get_id() << " blocking pair\n";
         }
         // if u is unmatched
         if (u_partnerlist.size() == 0 && in_blocking_pair[u] == true) {
-            ////////////////////////////////////////////////////////////
-            //std::cout << u->get_id() << " is unmatched and in blocking pair\n";
             return false;
         }
     }
@@ -84,7 +63,7 @@ bool RelaxedStable::is_relaxed_stable(const std::unique_ptr<BipartiteGraph>& G, 
     for (auto& B1 : B_partition) {
         auto v = B1.second;
         auto v_lower_quota = v->get_lower_quota();
-        auto v_partnerlist = M_[v];
+        auto v_partnerlist = M[v];
         for (auto pit = v_partnerlist.cbegin(), pie = v_partnerlist.cend(); pit != pie; ++pit) {
             auto u = v_partnerlist.get_vertex(pit);
             if (in_blocking_pair[u] == true) {
@@ -92,8 +71,6 @@ bool RelaxedStable::is_relaxed_stable(const std::unique_ptr<BipartiteGraph>& G, 
             }
         }
         if (v_lower_quota < 0) {
-            /////////////////////////////////////////////////////
-            //std::cout << v->get_id() << " has more blocking residents "<<v_lower_quota<<"\n";
             return false;
         }
     }
@@ -182,17 +159,6 @@ bool RelaxedStable::compute_matching() {
                 }
             }
         }
-        //////////////////////////////////
-        //std::cout << "after classical popular------------------------\n";
-        ///print_matching(G, M_, std::cout);
-        //std::cout << "-----------------------------------------------\n";
-
-        // if there is no feasible matching
-        //if (total_flow != required_flow) {
-          //  std::cout << "No feasible matching\n";
-            //return false;
-        //}
-
         //After finding minimal feasible matching
         std::map<VertexPtr, int> level;
         std::stack<VertexPtr> free_list;
@@ -202,11 +168,6 @@ bool RelaxedStable::compute_matching() {
             level[v] = 0;
             //if resident is unmatched add to freelist and make level 1
             if (M_.find(v) == M_.end()) {
-                ///////////////////////////////////////////
-                //if (v->get_id() == "r159") {
-                  //  std::cout << v->get_id() << " unmatched\n";
-                //}
-
                 free_list.push(v);
                 level[v] = 1;
             }
@@ -225,11 +186,6 @@ bool RelaxedStable::compute_matching() {
                 // highest ranked vertex to whom u not yet proposed
                 auto v = u_pref_list.get_vertex(u_pref_list.get_proposal_index());
 
-                ////////////////////////////////
-                //if (u->get_id() == "r159") {
-                  //  std::cout << u->get_id() << " proposed to " << v->get_id() << "\n";
-                //}
-                
                 // v's preference list and list of partners
                 auto& v_pref_list = v->get_preference_list();
                 auto& v_partner_list = M_[v];
@@ -242,11 +198,6 @@ bool RelaxedStable::compute_matching() {
 
                 // if v is undersubscribed
                 if (v_partner_list.size() < v->get_upper_quota()) {
-                    ////////////////////////////////
-                    //if (u->get_id() == "r159") {
-                      //  std::cout << u->get_id() << " accepted to "<<v->get_id()<<" 1st case\n";
-                    //}
-
                     // accept the proposal
                     u_partner_list.add_partner(std::make_pair(v_rank, v));
                     v_partner_list.add_partner(std::make_pair(u_rank, u));
@@ -279,11 +230,6 @@ bool RelaxedStable::compute_matching() {
                         u_partner_list.add_partner(std::make_pair(v_rank, v));
                         v_partner_list.add_partner(std::make_pair(u_rank, u));
 
-                        ////////////////////////////////
-                        //if (u->get_id() == "r159") {
-                          //  std::cout << u->get_id() << " replaced level 0 resident " << uc->get_id() << "\n";
-                        //}
-
                         //add uc to free list
                         free_list.push(uc);
                     }
@@ -307,11 +253,6 @@ bool RelaxedStable::compute_matching() {
                             u_partner_list.add_partner(std::make_pair(v_rank, v));
                             v_partner_list.add_partner(std::make_pair(u_rank, u));
 
-                            ////////////////////////////////
-                            //if (u->get_id() == "r159") {
-                            //    std::cout << u->get_id() << " replaced less preferred resident " << uc->get_id() << "\n";
-                            //}
-
                             // push uc to free list
                             free_list.push(uc);
                         }
@@ -323,12 +264,14 @@ bool RelaxedStable::compute_matching() {
                 u_pref_list.move_proposal_index();
             }
         }
-        if (is_relaxed_stable(G, M_)) {
-            std::cout << "Relaxed stable\n";
-        }
-        else {
-            std::cout << " Not Relaxed stable\n";
-        }
+        Statistics s;
+        s.get_statistics(G, M_);
+        //if (is_relaxed_stable(G, M_)) {
+        //    std::cout << "Relaxed stable\n";
+        //}
+        //else {
+         //   std::cout << " Not Relaxed stable\n";
+        //}
         return true;
     }
     else {
