@@ -26,14 +26,14 @@ bool RelaxedStable::is_relaxed_stable(const std::unique_ptr<BipartiteGraph>& G, 
         auto u = A1.second;
         in_blocking_pair[u] = false;
 
-        //resetting u's preference list's proposal index to 0
+        //u's preference list
         PreferenceList& u_pref_list = u->get_preference_list();
-
         auto u_partnerlist = M[u];
+
         //iterate through u's preference list
         for (PreferenceList::Iterator it = u_pref_list.all_begin();
             it != u_pref_list.all_end(); ++it) {
-            //hospital from u's pref list to check if (u,v) is blocking pair
+            //hospital v from u's pref list to check if (u,v) is blocking pair
             auto v = u_pref_list.get_vertex(it - u_pref_list.all_begin());
 
             //if this hospital is matched to this resident then no need to check for later hospitals
@@ -44,20 +44,20 @@ bool RelaxedStable::is_relaxed_stable(const std::unique_ptr<BipartiteGraph>& G, 
             PreferenceList& v_pref_list = v->get_preference_list();
             auto v_partnerlist = M[v];
             //if v is fully subscribed
-            if (v_partnerlist.size() >= v->get_upper_quota()) {
+            if (v_partnerlist.size() == v->get_upper_quota()) {
                 auto u_least_preferred = v_partnerlist.get_vertex(v_partnerlist.get_least_preferred());
                 if (v_pref_list.is_ranked_better(u_least_preferred, u)) {
                     continue;
                 }
             }
             in_blocking_pair[u] = true;
-            in_blocking_pair[v] = true;
         }
-        // if u is unmatched
+        // if u is unmatched and in blocking pair
         if (u_partnerlist.size() == 0 && in_blocking_pair[u] == true) {
             return false;
         }
     }
+
     //for each hospital
     auto B_partition = G->get_B_partition();
     for (auto& B1 : B_partition) {
@@ -127,13 +127,11 @@ bool RelaxedStable::compute_matching() {
     if (alg.compute_matching()) {
         //output matching of classified popular class
         MatchedPairListType M1_ = alg.get_matched_pairs();
-        FlowType required_flow = 0, total_flow = 0;
 
         //construct the above matching for the original graph with original ranks
         for (auto& it : G1->get_B_partition()) {
             auto u = it.second;
             auto M_u = M1_.find(u);
-            required_flow = required_flow + u->get_upper_quota();
             if (M_u != M1_.end()) {
                 //getting new vertex data
                 auto u_new = B_partition[u->get_id()];
@@ -142,7 +140,6 @@ bool RelaxedStable::compute_matching() {
 
                 auto& partners = M_u->second;
                 for (auto pit = partners.cbegin(), pie = partners.cend(); pit != pie; ++pit) {
-                    total_flow++;
                     auto v = partners.get_vertex(pit);
                     auto v_new = A_partition[v->get_id()];
                     auto& v_new_pref_list = v_new->get_preference_list();
@@ -150,15 +147,17 @@ bool RelaxedStable::compute_matching() {
 
                     // u's rank on v's preference list
                     auto u_rank = v_new_pref_list.get_rank(v_new_pref_list.find(u_new));
+                    
                     // v's rank on u's preference list
                     auto v_rank = u_new_pref_list.get_rank(u_new_pref_list.find(v_new));
-
+                    
                     // add to new matchings
                     u_new_partner_list.add_partner(std::make_pair(v_rank, v_new));
                     v_new_partner_list.add_partner(std::make_pair(u_rank, u_new));
                 }
             }
         }
+
         //After finding minimal feasible matching
         std::map<VertexPtr, int> level;
         std::stack<VertexPtr> free_list;
@@ -192,17 +191,17 @@ bool RelaxedStable::compute_matching() {
 
                 // u's rank on v's preference list
                 auto u_rank = v_pref_list.get_rank(v_pref_list.find(u));
-
+                
                 // v's rank on u's preference list
                 auto v_rank = u_pref_list.get_rank(u_pref_list.get_proposal_index());
-
+                
                 // if v is undersubscribed
                 if (v_partner_list.size() < v->get_upper_quota()) {
                     // accept the proposal
                     u_partner_list.add_partner(std::make_pair(v_rank, v));
                     v_partner_list.add_partner(std::make_pair(u_rank, u));
                 }
-                // if v is fully subscriibed
+                // if v is fully subscribed
                 else {
                     auto worst_partner1 = v_partner_list.cend();
                     //check for level 0 residents matched to v
@@ -264,13 +263,14 @@ bool RelaxedStable::compute_matching() {
                 u_pref_list.move_proposal_index();
             }
         }
+
         Statistics s;
         s.get_statistics(G, M_);
         //if (is_relaxed_stable(G, M_)) {
         //    std::cout << "Relaxed stable\n";
         //}
         //else {
-         //   std::cout << " Not Relaxed stable\n";
+        //    std::cout << " Not Relaxed stable\n";
         //}
         return true;
     }

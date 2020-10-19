@@ -19,6 +19,7 @@ public:
 public:
     Statistics();
     virtual ~Statistics();
+    std::unique_ptr<BipartiteGraph> get_duplicate_graph(const std::unique_ptr<BipartiteGraph>& G);
     void get_statistics(const std::unique_ptr<BipartiteGraph>& G, MatchedPairListType& M);
 };
 
